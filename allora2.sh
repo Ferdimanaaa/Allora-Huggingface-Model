@@ -24,7 +24,7 @@ echo -e "${BOLD}${DARK_YELLOW}RAM : 2 to 4 GB.${RESET}"
 echo -e "${BOLD}${DARK_YELLOW}Storage : SSD or NVMe with at least 5GB of space.${RESET}"
 echo
 
-echo -e "${CYAN}kamu ready untuk memulai, kalo ready pencet Y mgsky ganteng? (Y/N):${RESET}"
+echo -e "${CYAN}welcome to mgsky testnet hunter, siap memulai? pencet Y (Y/N):${RESET}"
 read -p "" response
 echo
 
@@ -34,7 +34,7 @@ if [[ ! "$response" =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-echo -e "${CYAN}Install dependencies allora, Ready ga, mgsky ganteng = (Y/N):${RESET}"
+echo -e "${CYAN}Install dependencies allora, sekarang lu install pencet Y, Mgsky nih boss = (Y/N):${RESET}"
 read -p "" installdep
 echo
 
@@ -96,20 +96,49 @@ if [[ "$installdep" =~ ^[Yy]$ ]]; then
     echo -e "${BOLD}${DARK_YELLOW}Checking go version...${RESET}"
     execute_with_prompt 'go version'
     echo
-
-    echo -e "${BOLD}${DARK_YELLOW}Install allocmd...${RESET}"
-    execute_with_prompt 'pip install allocmd --upgrade'
-    echo
 fi
 
 echo -e "${BOLD}${UNDERLINE}${DARK_YELLOW}Continuce Installing worker node...${RESET}"
-rm -rf basic-coin-prediction-node
-git clone https://github.com/allora-network/basic-coin-prediction-node
-cd basic-coin-prediction-node
-wget -q https://raw.githubusercontent.com/Ferdimanaaa/Allora-Huggingface-Model/main/app.py -O /root/basic-coin-prediction-node/app.py
-wget -q https://raw.githubusercontent.com/Ferdimanaaa/Allora-Huggingface-Model/main/main.py -O /root/basic-coin-prediction-node/main.py
-wget -q https://raw.githubusercontent.com/Ferdimanaaa/Allora-Huggingface-Model/main/requirements.txt -O /root/basic-coin-prediction-node/requirements.txt
+echo -e "${CYAN}Choose model: 24H HUGGING (Y)/ 10M: Offchain-node (N) :${RESET}"
+read -p "" model
 echo
+
+if [[ "$model" =~ ^[Yy]$ ]]; then
+
+    echo -e "${CYAN}Installing: 24H HUGGING MODEL :${RESET}"
+    echo
+    rm -rf basic-coin-prediction-node
+    git clone https://github.com/allora-network/basic-coin-prediction-node
+    cd basic-coin-prediction-node
+    
+    wget -q https://raw.githubusercontent.com/Ferdimanaaa/Allora-Huggingface-Model/main/app.py -O /root/basic-coin-prediction-node/app.py
+    wget -q https://raw.githubusercontent.com/Ferdimanaaa/Allora-Huggingface-Model/main/main.py -O /root/basic-coin-prediction-node/main.py
+    wget -q https://raw.githubusercontent.com/Ferdimanaaa/Allora-Huggingface-Model/main/requirements.txt -O /root/basic-coin-prediction-node/requirements.txt
+    wait
+else
+    echo -e "${CYAN}Installing: 10H Offchain-node :${RESET}"
+    git clone https://github.com/allora-network/allora-offchain-node
+    cd allora-offchain-node
+    echo
+fi
+echo
+
+
+echo -e "${BOLD}${DARK_YELLOW}Create new Wallet:${RESET}"
+
+echo -e "${CYAN}Backup your wallet or Create new testwallet (Y/N):${RESET}"
+read -p "" backupwallet
+echo
+
+if [[ "$backupwallet" =~ ^[Yy]$ ]]; then
+    allorad keys add testwallet --recover
+    wait
+fi
+echo
+
+wait
+
+echo -e "${BOLD}${UNDERLINE}${DARK_YELLOW}Continuce config worker node...${RESET}"
 
 printf 'Copy mnemonic phrase testwallet & paste here: '
 read HEX
@@ -118,71 +147,139 @@ if [ -f config.json ]; then
     rm config.json
     echo "Removed existing config.json file."
 fi
+if [[ "$model" =~ ^[Yy]$ ]]; then
+cat <<EOF > config.json
+    {
+        "wallet": {
+            "addressKeyName": "testwallet",
+            "addressRestoreMnemonic": "${HEX}",
+            "alloraHomeDir": "",
+            "gas": "1000000",
+            "gasAdjustment": 1.0,
+            "nodeRpc": "https://sentries-rpc.testnet-1.testnet.allora.network/",
+            "maxRetries": 1,
+            "delay": 1,
+            "submitTx": false
+        },
+        "worker": [
+            {
+                "topicId": 2,
+                "inferenceEntrypointName": "api-worker-reputer",
+                "loopSeconds": 5,
+                "parameters": {
+                    "InferenceEndpoint": "http://inference:8000/inference/{Token}",
+                    "Token": "ETH"
+                }
+            },
+            {
+                "topicId": 4,
+                "inferenceEntrypointName": "api-worker-reputer",
+                "loopSeconds": 5,
+                "parameters": {
+                    "InferenceEndpoint": "http://inference:8000/inference/{Token}",
+                    "Token": "BTC"
+                }
+            },
+            {
+                "topicId": 6,
+                "inferenceEntrypointName": "api-worker-reputer",
+                "loopSeconds": 5,
+                "parameters": {
+                    "InferenceEndpoint": "http://inference:8000/inference/{Token}",
+                    "Token": "SOL"
+                }
+            }
+        ]
+    }
+EOF
+else
 
 cat <<EOF > config.json
-{
-    "wallet": {
-        "addressKeyName": "testwallet",
-        "addressRestoreMnemonic": "${HEX}",
-        "alloraHomeDir": "",
-        "gas": "1000000",
-        "gasAdjustment": 1.0,
-        "nodeRpc": "https://sentries-rpc.testnet-1.testnet.allora.network/",
-        "maxRetries": 1,
-        "delay": 1,
-        "submitTx": false
-    },
-    "worker": [
-        {
-            "topicId": 2,
-            "inferenceEntrypointName": "api-worker-reputer",
-            "loopSeconds": 5,
-            "parameters": {
-                "InferenceEndpoint": "http://inference:8000/inference/{Token}",
-                "Token": "ETH"
-            }
+    {
+        "wallet": {
+            "addressKeyName": "testwallet",
+            "addressRestoreMnemonic": "${HEX}",
+            "alloraHomeDir": "",
+            "gas": "1000000",
+            "gasAdjustment": 1.0,
+            "nodeRpc": "https://sentries-rpc.testnet-1.testnet.allora.network/",
+            "maxRetries": 1,
+            "delay": 1,
+            "submitTx": true
         },
-        {
-            "topicId": 4,
+        "worker": [
+          {
+            "topicId": 1,
             "inferenceEntrypointName": "api-worker-reputer",
             "loopSeconds": 5,
             "parameters": {
-                "InferenceEndpoint": "http://inference:8000/inference/{Token}",
-                "Token": "BTC"
+              "InferenceEndpoint": "http://source:8000/inference/{Token}",
+              "Token": "ETH"
             }
-        }
-        {
-            "topicId": 6,
+          },
+          {
+            "topicId": 3,
             "inferenceEntrypointName": "api-worker-reputer",
             "loopSeconds": 5,
             "parameters": {
-                "InferenceEndpoint": "http://inference:8000/inference/{Token}",
-                "Token": "SOL"
+              "InferenceEndpoint": "http://source:8000/inference/{Token}",
+              "Token": "BTC"
             }
-        }
-    ]
-}
+          },
+          {
+            "topicId": 5,
+            "inferenceEntrypointName": "api-worker-reputer",
+            "loopSeconds": 5,
+            "parameters": {
+              "InferenceEndpoint": "http://source:8000/inference/{Token}",
+              "Token": "SOL"
+            }
+          }
+        ],
+        "reputer": [
+          {
+            "topicId": 1,
+            "reputerEntrypointName": "api-worker-reputer",
+            "loopSeconds": 30,
+            "minStake": 100000,
+            "parameters": {
+              "SourceOfTruthEndpoint": "http://source:8000/truth/{Token}/{BlockHeight}",
+              "Token": "ethereum"
+            }
+          },
+          {
+            "topicId": 3,
+            "reputerEntrypointName": "api-worker-reputer",
+            "loopSeconds": 30,
+            "minStake": 100000,
+            "parameters": {
+              "SourceOfTruthEndpoint": "http://source:8000/truth/{Token}/{BlockHeight}",
+              "Token": "bitcoin"
+            }
+          },
+          {
+            "topicId": 5,
+            "reputerEntrypointName": "api-worker-reputer",
+            "loopSeconds": 30,
+            "minStake": 100000,
+            "parameters": {
+              "SourceOfTruthEndpoint": "http://source:8000/truth/{Token}/{BlockHeight}",
+              "Token": "solana"
+            }
+          }
+        ]
+    }
 EOF
-
+fi
+echo -e "${BOLD}${UNDERLINE}${DARK_YELLOW} If docker not run when init done, try this ...${RESET}"
 execute_with_prompt 'chmod +x init.config'
-execute_with_prompt './init.config'
 
 echo
+echo -e "==============RUN: cd basic-coin-prediction-node"
+echo -e "==============RUN: cd allora-offchain-node"
 
-echo -e "${BOLD}${DARK_YELLOW}Faucet fund address worker:${RESET}"
-curl -L https://faucet.testnet-1.testnet.allora.network/send/allora-testnet-1/$(allorad keys  show testwallet -a --keyring-backend test)
-sleep 5
-curl -L https://faucet.testnet-1.testnet.allora.network/send/allora-testnet-1/$(allorad keys  show testwallet -a --keyring-backend test)
-sleep 10
-curl -L https://faucet.testnet-1.testnet.allora.network/send/allora-testnet-1/$(allorad keys  show testwallet -a --keyring-backend test)
-sleep 7
-
+echo -e "==============RUN: ./init.config"
+echo -e "==============RUN: docker compose up --build -d"
+echo -e "==============RUN: docker compose up --build -d"
+echo -e "==============VIEW LOGS: docker compose logs -f"
 echo
-wait
-
-echo -e "${BOLD}${UNDERLINE}${DARK_YELLOW}Building and starting Docker containers...${RESET}"
-docker compose up --build -d
-echo
-
-echo -e "${BOLD}${DARK_YELLOW}Checking running Docker containers...${RESET}"
-docker compose logs -f
