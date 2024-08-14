@@ -24,7 +24,7 @@ echo -e "${BOLD}${DARK_YELLOW}RAM : 2 to 4 GB.${RESET}"
 echo -e "${BOLD}${DARK_YELLOW}Storage : SSD or NVMe with at least 5GB of space.${RESET}"
 echo
 
-echo -e "${CYAN}Do you meet all of these requirements? (Y/N):${RESET}"
+echo -e "${CYAN}kamu ready untuk memulai, kalo ready pencet Y mgsky ganteng? (Y/N):${RESET}"
 read -p "" response
 echo
 
@@ -34,7 +34,7 @@ if [[ ! "$response" =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-echo -e "${CYAN}Install dependencies allora, If already install = N? (Y/N):${RESET}"
+echo -e "${CYAN}Install dependencies allora, Ready ga, mgsky ganteng = N? (Y/N):${RESET}"
 read -p "" installdep
 echo
 
