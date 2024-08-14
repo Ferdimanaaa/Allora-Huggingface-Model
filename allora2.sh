@@ -111,19 +111,6 @@ wget -q https://raw.githubusercontent.com/Ferdimanaaa/Allora-Huggingface-Model/m
 wget -q https://raw.githubusercontent.com/Ferdimanaaa/Allora-Huggingface-Model/main/requirements.txt -O /root/basic-coin-prediction-node/requirements.txt
 echo
 
-echo -e "${BOLD}${DARK_YELLOW}Create new Wallet:${RESET}"
-
-allorad keys add testwallet
-wait
-
-echo
-echo -e "${BOLD}${DARK_YELLOW}Copy mnemonic phrase & paste here:${RESET}"
-allorad keys add testwallet --recover --keyring-backend test --unarmored-hex --unsafe
-echo
-wait
-
-echo -e "${BOLD}${UNDERLINE}${DARK_YELLOW}Continuce config worker node...${RESET}"
-
 printf 'Copy mnemonic phrase testwallet & paste here: '
 read HEX
 
