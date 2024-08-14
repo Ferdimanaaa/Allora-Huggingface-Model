@@ -108,7 +108,7 @@ git clone https://github.com/allora-network/basic-coin-prediction-node
 cd basic-coin-prediction-node
 wget -q https://raw.githubusercontent.com/Ferdimanaaa/Allora-Huggingface-Model/main/app.py -O /root/basic-coin-prediction-node/app.py
 wget -q https://raw.githubusercontent.com/Ferdimanaaa/Allora-Huggingface-Model/main/main.py -O /root/basic-coin-prediction-node/main.py
-wget -q https://raw.githubusercontent.com/ReJumpLabs/Hugging-Face-model/main/requirements.txt -O /root/basic-coin-prediction-node/requirements.txt
+wget -q https://raw.githubusercontent.com/Ferdimanaaa/Allora-Huggingface-Model/main/requirements.txt -O /root/basic-coin-prediction-node/requirements.txt
 echo
 
 echo -e "${BOLD}${DARK_YELLOW}Create new Wallet:${RESET}"
