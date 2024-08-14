@@ -34,7 +34,7 @@ if [[ ! "$response" =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-echo -e "${CYAN}Install dependencies allora, Ready ga, mgsky ganteng = N? (Y/N):${RESET}"
+echo -e "${CYAN}Install dependencies allora, Ready ga, mgsky ganteng = (Y/N):${RESET}"
 read -p "" installdep
 echo
 
